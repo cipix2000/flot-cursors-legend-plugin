@@ -89,8 +89,8 @@ input[type=checkbox] {
 }
 .cursor-legend {
     position: relative;
-    width: 33%;
-    height: 50px;
+    width: 50%;
+    height: 100px;
     font-size: 14px;
     line-height: 1.2em;
 }
