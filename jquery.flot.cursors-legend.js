@@ -20,7 +20,7 @@ Licensed under the MIT license.
 
     function init(plot) {
         var legendDiv;
-        var grid;
+        var grid, menu;
 
         plot.hooks.processOptions.push(function (plot, options) {
             if (!options.cursorsLegendDiv) {
@@ -33,7 +33,7 @@ Licensed under the MIT license.
 
             grid = populateLegendDiv(plot, legendDiv);
             populatePopupDiv(plot, legendDiv);
-            populateMenuDiv(plot, legendDiv);
+            menu = populateMenuDiv(plot, legendDiv);
 
             plot.hooks.bindEvents.push(function (plot) {
                 plot.getPlaceholder().bind('cursorupdates', onCursorUpdates);
@@ -41,6 +41,9 @@ Licensed under the MIT license.
 
             plot.hooks.shutdown.push(function (plot) {
                 plot.getPlaceholder().unbind('cursorupdates');
+                grid.jqxGrid('destroy');
+                menu.jqxMenu('destroy');
+                //popUp.destroy();
             });
         });
 
@@ -135,6 +138,8 @@ Licensed under the MIT license.
                 plot.removeCursor(plot.getCursors()[rowid]);
             }
         });
+
+        return menu;
     }
 
     function populatePopupDiv(plot, div) {
@@ -266,7 +271,7 @@ Licensed under the MIT license.
 
     function populateLegendDiv(plot, div) {
         div.empty();
-        
+
         var grid = $('<div id="jqxgrid"/>');
         grid.appendTo(div);
 
@@ -351,7 +356,7 @@ Licensed under the MIT license.
                 return false;
             }
         });
-        
+
         return grid;
     }
 

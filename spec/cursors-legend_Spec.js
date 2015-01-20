@@ -77,7 +77,7 @@ describe('Flot cursors legend', function () {
         expect(name).toBe('Red cursor');
     });
 
-    it('should show the x,y coordinates of the cursor as the second and third value on the grid', function () {
+    it('should show the x and y coordinates of the cursor as the second and third value on the grid', function () {
         plot = $.plot("#placeholder", [sampledata], {
             cursors: [
                 {
@@ -100,5 +100,40 @@ describe('Flot cursors legend', function () {
 
         expect(parseFloat(x)).toBe(1);
         expect(parseFloat(y)).toBe(1.1);
+    });
+
+    describe('Interaction', function () {
+        it('should open the context menu on right clicking on a cursor row', function () {
+            plot = $.plot("#placeholder", [sampledata], {
+                cursors: [
+                    {
+                        name: 'Blue cursor',
+                        color: 'blue',
+                        position: {
+                            x: 1,
+                            y: 1.1
+                        }
+                    }
+                ],
+                cursorsLegendDiv: 'cursorsLegend'
+            });
+
+            var element = $('#row0jqxgrid');
+
+            var name = $('#row0jqxgrid').children('.jqx-grid-cell').first();
+
+            name.trigger({
+                type: 'mousedown',
+                pageX: name.offset().left,
+                clientX: name.offset().left,
+                pageY: name.offset().top,
+                clientY: name.offset().top,
+                which: 3
+            });
+
+            jasmine.clock().tick(1000);
+
+            expect(true).toBe(false);
+        });
     });
 });
