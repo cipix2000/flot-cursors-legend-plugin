@@ -53,7 +53,7 @@ describe('Flot cursors legend', function () {
 
         expect(name).toBe('Blue cursor');
     });
-    
+
     it('should show the new name of the cursor when the name changes', function () {
         plot = $.plot("#placeholder", [sampledata], {
             cursors: [
@@ -67,15 +67,16 @@ describe('Flot cursors legend', function () {
 
         jasmine.clock().tick(20);
 
+        plot.setCursor(plot.getCursors()[0], {
+            name: 'Red cursor'
+        });
+
+        jasmine.clock().tick(20);
+
         var name = $('#row0jqxgrid').children('.jqx-grid-cell').first().text();
-        expect(name).toBe('Blue cursor');
-        
-        plot.setCursor(plot.getCursors()[0], {name: 'Red Cursor'});
-        
-        name = $('#row0jqxgrid').children('.jqx-grid-cell').first().text();
         expect(name).toBe('Red cursor');
     });
-    
+
     it('should show the x,y coordinates of the cursor as the second and third value on the grid', function () {
         plot = $.plot("#placeholder", [sampledata], {
             cursors: [
@@ -84,7 +85,7 @@ describe('Flot cursors legend', function () {
                     color: 'blue',
                     position: {
                         x: 1,
-                        y:1.1
+                        y: 1.1
                     }
                 }
             ],
@@ -94,7 +95,7 @@ describe('Flot cursors legend', function () {
         jasmine.clock().tick(20);
 
         var row0 = $('#row0jqxgrid');
-        var x = row0.children('.jqx-grid-cell').first().next().text();
+        var x = row0.children('.jqx-grid-cell').eq(1).text();
         var y = row0.children('.jqx-grid-cell').last().text();
 
         expect(parseFloat(x)).toBe(1);

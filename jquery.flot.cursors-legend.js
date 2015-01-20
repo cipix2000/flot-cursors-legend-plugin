@@ -49,6 +49,7 @@ Licensed under the MIT license.
             cursordata.forEach(function (cursor) {
                 var row = grid.jqxGrid('getrowdata', i);
                 if (row) {
+                    row.cursorname = cursor.cursor;
                     row.x = cursor.x;
                     row.y = cursor.y;
                     grid.jqxGrid('updaterow', i, row);
