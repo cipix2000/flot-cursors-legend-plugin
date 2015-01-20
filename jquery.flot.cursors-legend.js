@@ -20,9 +20,9 @@ Licensed under the MIT license.
 
     function init(plot) {
         var legendDiv;
+        var grid;
 
         plot.hooks.processOptions.push(function (plot, options) {
-
             if (!options.cursorsLegendDiv) {
                 return;
             }
@@ -30,7 +30,8 @@ Licensed under the MIT license.
             if (!legendDiv) {
                 return;
             }
-            populateLegendDiv(plot, legendDiv);
+
+            grid = populateLegendDiv(plot, legendDiv);
             populatePopupDiv(plot, legendDiv);
             populateMenuDiv(plot, legendDiv);
 
@@ -46,11 +47,11 @@ Licensed under the MIT license.
         var onCursorUpdates = function (event, cursordata) {
             var i = 0;
             cursordata.forEach(function (cursor) {
-                var row = $("#jqxgrid").jqxGrid('getrowdata', i);
+                var row = grid.jqxGrid('getrowdata', i);
                 if (row) {
                     row.x = cursor.x;
                     row.y = cursor.y;
-                    $('#jqxgrid').jqxGrid('updaterow', i, row);
+                    grid.jqxGrid('updaterow', i, row);
                 }
                 i++;
             });
@@ -264,7 +265,9 @@ Licensed under the MIT license.
 
     function populateLegendDiv(plot, div) {
         div.empty();
-        div.append('<div id="jqxgrid"/>');
+        
+        var grid = $('<div id="jqxgrid"/>');
+        grid.appendTo(div);
 
         var data = [];
         plot.getCursors().forEach(function (cursor) {
@@ -306,7 +309,7 @@ Licensed under the MIT license.
         var dataAdapter = new $.jqx.dataAdapter(source);
 
         // initialize jqxGrid
-        $("#jqxgrid").jqxGrid({
+        grid.jqxGrid({
             width: div.width(),
             height: div.height(),
             source: dataAdapter,
@@ -333,13 +336,13 @@ Licensed under the MIT license.
             ]
         });
 
-        $("#jqxgrid").on('contextmenu', function () {
+        grid.on('contextmenu', function () {
             return false;
         });
 
-        $("#jqxgrid").on('rowclick', function (event) {
+        grid.on('rowclick', function (event) {
             if (event.args.rightclick) {
-                $("#jqxgrid").jqxGrid('selectrow', event.args.rowindex);
+                grid.jqxGrid('selectrow', event.args.rowindex);
                 var scrollTop = $(window).scrollTop();
                 var scrollLeft = $(window).scrollLeft();
                 $("#Menu").jqxMenu('open', parseInt(event.args.originalEvent.clientX) + 5 + scrollLeft, parseInt(event.args.originalEvent.clientY) + 5 + scrollTop);
@@ -347,6 +350,8 @@ Licensed under the MIT license.
                 return false;
             }
         });
+        
+        return grid;
     }
 
     $.plot.plugins.push({
