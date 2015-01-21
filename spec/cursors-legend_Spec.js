@@ -7,6 +7,41 @@ describe('Flot cursors legend', function () {
     var sampledata = [[0, 1], [1, 1.1], [2, 1.2]];
     var plot;
 
+    function simulateRightClickOn(element) {
+        element.trigger({
+            type: 'mousedown',
+            pageX: element.offset().left,
+            clientX: element.offset().left,
+            pageY: element.offset().top,
+            clientY: element.offset().top,
+            which: 3
+        });
+    }
+
+    function simulateClickOn(element) {
+        element.trigger({
+            type: 'mousedown',
+            pageX: element.offset().left + 10,
+            clientX: element.offset().left + 10,
+            pageY: element.offset().top + 5,
+            clientY: element.offset().top + 5
+        }).trigger({
+            type: 'mouseup',
+            pageX: element.offset().left + 10,
+            clientX: element.offset().left + 10,
+            pageY: element.offset().top + 5,
+            clientY: element.offset().top + 5
+        }).trigger({
+            type: 'click',
+            pageX: element.offset().left + 10,
+            clientX: element.offset().left + 10,
+            pageY: element.offset().top + 5,
+            clientY: element.offset().top + 5
+        });
+
+
+    }
+
     beforeEach(function () {
         jasmine.clock().install();
     });
@@ -118,22 +153,72 @@ describe('Flot cursors legend', function () {
                 cursorsLegendDiv: 'cursorsLegend'
             });
 
-            var element = $('#row0jqxgrid');
-
             var name = $('#row0jqxgrid').children('.jqx-grid-cell').first();
+            var menu = $('#Menu');
 
-            name.trigger({
-                type: 'mousedown',
-                pageX: name.offset().left,
-                clientX: name.offset().left,
-                pageY: name.offset().top,
-                clientY: name.offset().top,
-                which: 3
+            expect(menu.is(':visible')).toBe(false);
+
+            simulateRightClickOn(name);
+            jasmine.clock().tick(1); // give it enough time to animate into view
+
+            expect(menu.is(':visible')).toBe(true);
+        });
+
+        describe('Context Menu', function () {
+            it('should close when clicking outside of the menu', function () {
+                plot = $.plot("#placeholder", [sampledata], {
+                    cursors: [
+                        {
+                            name: 'Blue cursor',
+                            color: 'blue',
+                            position: {
+                                x: 1,
+                                y: 1.1
+                            }
+                    }
+                ],
+                    cursorsLegendDiv: 'cursorsLegend'
+                });
+
+                var name = $('#row0jqxgrid').children('.jqx-grid-cell').first();
+                simulateRightClickOn(name);
+                jasmine.clock().tick(1); // give it enough time to animate into view
+
+                var menu = $('#Menu');
+                expect(menu.is(':visible')).toBe(true);
+
+                simulateClickOn(name);
+                jasmine.clock().tick(1); // give it enough time to animate into oblivion
+
+                expect(menu.is(':visible')).toBe(false);
             });
 
-            jasmine.clock().tick(1000);
+            it('should create a cursor when clicking on "Add Cursor"', function () {
+                plot = $.plot("#placeholder", [sampledata], {
+                    cursors: [
+                        {
+                            name: 'Blue cursor',
+                            color: 'blue',
+                            position: {
+                                x: 1,
+                                y: 1.1
+                            }
+                    }
+                ],
+                    cursorsLegendDiv: 'cursorsLegend'
+                });
 
-            expect(true).toBe(false);
+                var name = $('#row0jqxgrid').children('.jqx-grid-cell').first();
+                simulateRightClickOn(name);
+                jasmine.clock().tick(1); // give it enough time to animate into view
+
+                var menu = $('#Menu');
+                var addCursor = menu.find('li').eq(2);
+                simulateClickOn(addCursor);
+                jasmine.clock().tick(20);
+                
+                expect(plot.getCursors().length).toBe(2);
+            });
         });
     });
 });

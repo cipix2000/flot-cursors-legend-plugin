@@ -20,7 +20,7 @@ Licensed under the MIT license.
 
     function init(plot) {
         var legendDiv;
-        var grid, menu;
+        var grid, menu, popup;
 
         plot.hooks.processOptions.push(function (plot, options) {
             if (!options.cursorsLegendDiv) {
@@ -32,7 +32,7 @@ Licensed under the MIT license.
             }
 
             grid = populateLegendDiv(plot, legendDiv);
-            populatePopupDiv(plot, legendDiv);
+            popup = populatePopupDiv(plot, legendDiv);
             menu = populateMenuDiv(plot, legendDiv);
 
             plot.hooks.bindEvents.push(function (plot) {
@@ -43,6 +43,7 @@ Licensed under the MIT license.
                 plot.getPlaceholder().unbind('cursorupdates');
                 grid.jqxGrid('destroy');
                 menu.jqxMenu('destroy');
+                popup.jqxWindow('destroy');
                 //popUp.destroy();
             });
         });
@@ -74,6 +75,10 @@ Licensed under the MIT license.
 
         // create context menu
         var contextMenu = $("#Menu").jqxMenu({
+            animationShowDelay: 0,
+            animationHideDelay: 0,
+            animationShowDuration: 0,
+            animationHideDuration: 0,
             width: 200,
             height: 81,
             autoOpenPopup: false,
@@ -169,7 +174,7 @@ Licensed under the MIT license.
         $("#cursorname").height(23);
 
         // initialize the popup window and buttons.
-        $("#popupWindow").jqxWindow({
+        popup.jqxWindow({
             width: 300,
             height: 300,
             resizable: false,
@@ -265,8 +270,10 @@ Licensed under the MIT license.
                 snapToPlot: [undefined, 0, 1][snapToId]*/
             });
 
-            $("#popupWindow").jqxWindow('hide');
+            popup.jqxWindow('hide');
         });
+
+        return popup;
     }
 
     function populateLegendDiv(plot, div) {
