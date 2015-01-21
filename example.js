@@ -3,6 +3,12 @@
 
 $(function () {
     'use strict';
+
+    /*disable the browser context menu*/
+    $(document).on('contextmenu', function (e) {
+        return false;
+    });
+
     var plot;
     var offset = 0.0;
     var sin = [],

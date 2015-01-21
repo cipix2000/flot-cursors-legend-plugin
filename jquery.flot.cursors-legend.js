@@ -69,8 +69,8 @@ Licensed under the MIT license.
         menu.appendTo(div);
         var list = $('<ul/>');
         list.appendTo(menu);
-        ['Edit Selected Cursor', 'Delete Selected Cursor', 'Add Cursor'].forEach(function (menu) {
-            $('<li>' + menu + '</li>').appendTo(list);
+        ['Edit Selected Cursor', 'Delete Selected Cursor', 'Add Cursor'].forEach(function (menu, i) {
+            $('<li id="item' + i + '">' + menu + '</li>').appendTo(list);
         });
 
         // create context menu
@@ -349,7 +349,17 @@ Licensed under the MIT license.
             ]
         });
 
-        grid.on('contextmenu', function () {
+        grid.on('contextmenu', function (event) {
+            /*
+            var scrollTop = $(window).scrollTop();
+            var scrollLeft = $(window).scrollLeft();
+            $("#Menu").jqxMenu('disable', 'item0', true);
+            $("#Menu").jqxMenu('disable', 'item1', true);
+            $("#Menu").jqxMenu('open', parseInt(event.args.originalEvent.clientX) + 5 + scrollLeft, parseInt(event.args.originalEvent.clientY) + 5 + scrollTop);
+
+            event.stopPropagation();
+            event.preventDefault();
+            */
             return false;
         });
 
@@ -358,7 +368,12 @@ Licensed under the MIT license.
                 grid.jqxGrid('selectrow', event.args.rowindex);
                 var scrollTop = $(window).scrollTop();
                 var scrollLeft = $(window).scrollLeft();
+                $("#Menu").jqxMenu('disable', 'item0', false);
+                $("#Menu").jqxMenu('disable', 'item1', false);
                 $("#Menu").jqxMenu('open', parseInt(event.args.originalEvent.clientX) + 5 + scrollLeft, parseInt(event.args.originalEvent.clientY) + 5 + scrollTop);
+
+                event.stopPropagation();
+                event.preventDefault();
 
                 return false;
             }

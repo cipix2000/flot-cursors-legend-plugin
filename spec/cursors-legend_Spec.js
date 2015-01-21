@@ -164,6 +164,24 @@ describe('Flot cursors legend', function () {
             expect(menu.is(':visible')).toBe(true);
         });
 
+        it('should open the context menu on right clicking on an empty surface inside the legend', function () {
+            plot = $.plot("#placeholder", [sampledata], {
+                cursors: [],
+                cursorsLegendDiv: 'cursorsLegend'
+            });
+
+            var name = $('#row0jqxgrid').children('.jqx-grid-cell').first();
+            var menu = $('#Menu');
+
+            expect(menu.is(':visible')).toBe(false);
+
+            simulateRightClickOn(name);
+            jasmine.clock().tick(1); // give it enough time to animate into view
+
+            expect(menu.is(':visible')).toBe(true);
+        });
+
+
         describe('Context Menu', function () {
             it('should close when clicking outside of the menu', function () {
                 plot = $.plot("#placeholder", [sampledata], {
@@ -220,7 +238,6 @@ describe('Flot cursors legend', function () {
                 expect(menu.is(':visible')).toBe(false);
             });
 
-
             it('should create a cursor when clicking on "Add Cursor"', function () {
                 plot = $.plot("#placeholder", [sampledata], {
                     cursors: [
@@ -247,6 +264,34 @@ describe('Flot cursors legend', function () {
 
                 expect(plot.getCursors().length).toBe(2);
             });
+
+            it('should delete the cursor when clicking on "Delete Cursor"', function () {
+                plot = $.plot("#placeholder", [sampledata], {
+                    cursors: [
+                        {
+                            name: 'Blue cursor',
+                            color: 'blue',
+                            position: {
+                                x: 1,
+                                y: 1.1
+                            }
+                        }
+                    ],
+                    cursorsLegendDiv: 'cursorsLegend'
+                });
+
+                var name = $('#row0jqxgrid').children('.jqx-grid-cell').first();
+                simulateRightClickOn(name);
+                jasmine.clock().tick(1); // give it enough time to animate into view
+
+                var menu = $('#Menu');
+                var addCursor = menu.find('li').eq(1);
+                simulateClickOn(addCursor);
+                jasmine.clock().tick(20);
+
+                expect(plot.getCursors().length).toBe(0);
+            });
+
         });
     });
 });
