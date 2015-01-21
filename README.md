@@ -7,7 +7,11 @@ The legend uses jqWidgets which is not free for commercial use. See <http://www.
 Usage
 =====
 
-*cursorsLegendDiv :* the placeholder for the cursor legend
+Include both jquery.flot.cursors and jquery.flot.cursors-legend plugins in your page.
+The cursor legend is placed into a div that you need to specify by adding cursorsLegendDiv
+option to the plot:
+
+*cursorsLegendDiv :* the placeholder div for the cursor legend
 
     var plot = $.plot("#plotDiv", data, {
         cursors: [
