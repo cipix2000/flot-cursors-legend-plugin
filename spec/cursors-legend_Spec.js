@@ -193,6 +193,34 @@ describe('Flot cursors legend', function () {
                 expect(menu.is(':visible')).toBe(false);
             });
 
+            it('should close after clicking on an option in the menu', function () {
+                plot = $.plot("#placeholder", [sampledata], {
+                    cursors: [
+                        {
+                            name: 'Blue cursor',
+                            color: 'blue',
+                            position: {
+                                x: 1,
+                                y: 1.1
+                            }
+                    }
+                ],
+                    cursorsLegendDiv: 'cursorsLegend'
+                });
+
+                var name = $('#row0jqxgrid').children('.jqx-grid-cell').first();
+                simulateRightClickOn(name);
+                jasmine.clock().tick(1); // give it enough time to animate into view
+
+                var menu = $('#Menu');
+                var addCursor = menu.find('li').eq(2);
+                simulateClickOn(addCursor);
+                jasmine.clock().tick(1);
+
+                expect(menu.is(':visible')).toBe(false);
+            });
+
+
             it('should create a cursor when clicking on "Add Cursor"', function () {
                 plot = $.plot("#placeholder", [sampledata], {
                     cursors: [
@@ -216,7 +244,7 @@ describe('Flot cursors legend', function () {
                 var addCursor = menu.find('li').eq(2);
                 simulateClickOn(addCursor);
                 jasmine.clock().tick(20);
-                
+
                 expect(plot.getCursors().length).toBe(2);
             });
         });
