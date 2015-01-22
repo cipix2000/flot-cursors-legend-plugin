@@ -340,14 +340,23 @@ Licensed under the MIT license.
     }
 
     function setPosition(plot, cursor, pos) {
+        var o;
         if (!pos)
             return;
 
-        if ((pos.relativeX !== undefined) && (pos.relativeY !== undefined)) {
+        o = plot.p2c(pos);
+
+        if ((pos.relativeX !== undefined)) {
             cursor.x = Math.max(0, Math.min(pos.relativeX, plot.width()));
+            if (pos.relativeY === undefined) {
+                cursor.y = Math.max(0, Math.min(o.top, plot.height()));
+            } else {
+                cursor.y = Math.max(0, Math.min(pos.relativeY, plot.height()));
+            }
+        } else if (pos.relativeY !== undefined) {
+            cursor.x = Math.max(0, Math.min(o.left, plot.width()));
             cursor.y = Math.max(0, Math.min(pos.relativeY, plot.height()));
         } else {
-            var o = plot.p2c(pos);
             cursor.x = Math.max(0, Math.min(o.left, plot.width()));
             cursor.y = Math.max(0, Math.min(o.top, plot.height()));
         }
@@ -371,33 +380,34 @@ Licensed under the MIT license.
         var width = plot.width();
         var height = plot.height();
         var textAlign = 'left';
-        
+
         var y = cursor.y;
         var x = cursor.x;
-        
-        if (x > (width/2)) {
+
+        if (x > (width / 2)) {
             x -= 10;
             textAlign = 'right';
         } else {
             x += 10;
         }
-        
-        if (y > (height/2)) {
+
+        if (y > (height / 2)) {
             y -= 10 + offset;
         } else {
             y += 20;
         }
-        
-        return {x: x,
-                y: y,
-                textAlign: textAlign
-               };
+
+        return {
+            x: x,
+            y: y,
+            textAlign: textAlign
+        };
     }
-    
+
     function drawLabel(plot, ctx, cursor) {
         if (cursor.showLabel) {
             ctx.beginPath();
-            var position = computeLabelPosition(plot, cursor, typeof cursor.showValuesRelativeToSeries === 'number' ? 20: 0);
+            var position = computeLabelPosition(plot, cursor, typeof cursor.showValuesRelativeToSeries === 'number' ? 20 : 0);
             ctx.fillStyle = cursor.color;
             ctx.textAlign = position.textAlign;
             ctx.fillText(cursor.name, position.x, position.y);
@@ -429,15 +439,15 @@ Licensed under the MIT license.
             var yaxis = series.yaxis;
 
             var text = '' + xaxis.c2p(cursor.x).toFixed(2) + ', ' + yaxis.c2p(cursor.y).toFixed(2);
-            
-            var position = computeLabelPosition(plot, cursor, cursor.showLabel ? 20: 0);
+
+            var position = computeLabelPosition(plot, cursor, cursor.showLabel ? 20 : 0);
 
             ctx.fillStyle = cursor.color;
             ctx.textAlign = position.textAlign;
             ctx.fillText(text, position.x, position.y + (cursor.showLabel ? 20 : 0));
-            
+
             ctx.textAlign = 'left';
-            
+
             ctx.stroke();
         }
     }
@@ -515,7 +525,7 @@ Licensed under the MIT license.
 
         return (hasHorizontalLine(cursor) && (mouseY > cursor.y - 4) && (mouseY < cursor.y + 4) && (mouseX > 0) && (mouseY < plot.width()));
     }
-    
+
     $.plot.plugins.push({
         init: init,
         options: options,
