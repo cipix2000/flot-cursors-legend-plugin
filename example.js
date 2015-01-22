@@ -79,7 +79,7 @@ $(function () {
                 name: 'Blue cursor',
                 mode: 'xy',
                 color: '#0000ff',
-                showIntersections: true,
+                showIntersections: false,
                 snapToPlot: 1,
                 symbol: 'diamond',
                 position: {
@@ -91,7 +91,7 @@ $(function () {
                 name: 'Green cursor',
                 mode: 'y',
                 color: '#00a000',
-                showIntersections: true,
+                showIntersections: false,
                 symbol: 'cross',
                 showValuesRelativeToSeries: 0,
                 showLabel: true,
