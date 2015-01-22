@@ -38,8 +38,6 @@ describe('Flot cursors legend', function () {
             pageY: element.offset().top + 5,
             clientY: element.offset().top + 5
         });
-
-
     }
 
     beforeEach(function () {
@@ -164,7 +162,7 @@ describe('Flot cursors legend', function () {
             expect(menu.is(':visible')).toBe(true);
         });
 
-        it('should open the context menu on right clicking on an empty surface inside the legend', function () {
+        xit('should open the context menu on right clicking on an empty surface inside the legend', function () {
             plot = $.plot("#placeholder", [sampledata], {
                 cursors: [],
                 cursorsLegendDiv: 'cursorsLegend'
@@ -292,6 +290,25 @@ describe('Flot cursors legend', function () {
                 expect(plot.getCursors().length).toBe(0);
             });
 
+            it('should create a div for legend when cursorsLegendDiv is null', function () {
+                plot = $.plot("#placeholder", [sampledata], {
+                    cursors: [
+                        {
+                            name: 'Blue cursor',
+                            color: 'blue',
+                            position: {
+                                x: 1,
+                                y: 1.1
+                            }
+                        }
+                    ],
+                    cursorsLegendDiv: null
+                });
+
+                var div = $('autoDiv');
+
+                expect(div.first()).not.toBe(0);
+            });
         });
     });
 });

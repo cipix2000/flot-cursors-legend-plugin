@@ -23,10 +23,20 @@ Licensed under the MIT license.
         var grid, menu, popup;
 
         plot.hooks.processOptions.push(function (plot, options) {
-            if (!options.cursorsLegendDiv) {
+
+            if (options.cursorsLegendDiv === undefined) {
                 return;
             }
-            legendDiv = $('#' + options.cursorsLegendDiv);
+
+            if (options.cursorsLegendDiv === null) {
+                legendDiv = $('<div id="autoDiv" style="position: absolute; height: 100px;width: 400px; top: ' +
+                    (plot.getPlaceholder().offset().top + plot.getPlaceholder().height() + 10) + 'px; left:' +
+                    (plot.getPlaceholder().offset().left + 50) + 'px;"\>');
+                legendDiv.appendTo(plot.getPlaceholder().parent());
+            } else {
+                legendDiv = $('#' + options.cursorsLegendDiv);
+            }
+
             if (!legendDiv) {
                 return;
             }
@@ -104,17 +114,8 @@ Licensed under the MIT license.
 
                 var cursorData = plot.getCursors()[editrow];
                 $("#cursorname").val(dataRecord.cursorname);
-                $("#dropDownButton").jqxDropDownButton('setContent', getTextElementByColor(new $.jqx.color({
-                    hex: cursorData.color.substring(1)
-                })));
-
-                $("#dropDownList").jqxDropDownList('selectItem', cursorData.mode);
-                /*
-                $("#jqxshapedropdownlist").jqxDropDownList('selectItem', cursorData.symbol);
-                $("#jqxsnapdropdownlist").jqxDropDownList('selectItem', (cursorData.snapToPlot !== undefined) ? 'plot ' + (cursorData.snapToPlot + 1) : 'none');
                 $('#jqxcheckbox1').val(cursorData.showLabel);
-                $('#jqxcheckbox2').val(cursorData.showIntersections);
-                */
+                $('#jqxcheckbox2').val(cursorData.showValuesRelativeToSeries === 0);
                 // show the popup window.
                 $("#popupWindow").jqxWindow('show');
             } else if ($.trim($(args).text()) == "Add Cursor") {
@@ -160,11 +161,11 @@ Licensed under the MIT license.
         var bodyDiv = $('<div id="popupBody" style="overflow: hidden;" />').appendTo(popup);
         bodyDiv.append('<span id="cursorNameText">Name</span>');
         bodyDiv.append('<input id="cursorname" />');
-        bodyDiv.append('<span id="colorText">Color</span>');
-        $('<div id="dropDownButton"\>').appendTo(bodyDiv)
-            .append('<div id="colorPicker">');
+        bodyDiv.append('<br>');
         bodyDiv.append('<span id="modeText">Mode</span>');
         bodyDiv.append('<div id="dropDownList"\>');
+        bodyDiv.append('<div id="jqxcheckbox1">Show Label</div>');
+        bodyDiv.append('<div id="jqxcheckbox2">Show Value</div>');
         bodyDiv.append('<input style="margin-right: 5px;" type="button" id="Apply" value="Apply" />');
         bodyDiv.append('<input id="Cancel" type="button" value="Cancel" />');
 
@@ -175,8 +176,8 @@ Licensed under the MIT license.
 
         // initialize the popup window and buttons.
         popup.jqxWindow({
-            width: 300,
-            height: 300,
+            width: 400,
+            height: 200,
             resizable: false,
             isModal: true,
             autoOpen: false,
@@ -185,7 +186,7 @@ Licensed under the MIT license.
         });
         $("#Cancel").jqxButton({});
         $("#Apply").jqxButton({});
-        /*
+
         $("#jqxcheckbox1").jqxCheckBox({
             //width: 120,
             height: 25
@@ -194,34 +195,6 @@ Licensed under the MIT license.
             //width: 120,
             height: 25
         });
-
-        $("#jqxcheckbox3").jqxCheckBox({
-            //width: 120,
-            height: 25
-        });
-        */
-
-        $("#colorPicker").on('colorchange', function (event) {
-            $("#dropDownButton").jqxDropDownButton('setContent', getTextElementByColor(event.args.color));
-        });
-
-        $("#dropDownButton").jqxDropDownButton({
-            animationType: 'none',
-            width: '100%',
-            dropDownHeight: 250,
-            height: 30
-        });
-
-        $("#colorPicker").jqxColorPicker({
-            color: "ffaabb",
-            colorMode: 'hue',
-            width: '100%',
-            height: 242
-        });
-
-        $("#dropDownButton").jqxDropDownButton('setContent', getTextElementByColor(new $.jqx.color({
-            hex: "ffaabb"
-        })));
 
         $("#dropDownList").jqxDropDownList({
             source: cursorModes,
@@ -250,22 +223,21 @@ Licensed under the MIT license.
             row.cursorname = $("#cursorname").val();
             var mode = $('#dropDownList').val();
             //var shape = $('#jqxshapedropdownlist').val();
-            var color = $('#dropDownButton').val();
             var rowid = $("#jqxgrid").jqxGrid('getrowid', editrow);
             /*
             var snapToId = $("#jqxsnapdropdownlist").jqxDropDownList('getSelectedItem').index;
-            var showLabel = $('#jqxcheckbox1').val();
-            var showIntersections = $('#jqxcheckbox2').val();
             */
+            var showLabel = $('#jqxcheckbox1').val();
+            var showValue = $('#jqxcheckbox2').val();
+
             $('#jqxgrid').jqxGrid('updaterow', rowid, row);
 
             plot.setCursor(plot.getCursors()[rowid], {
                 name: row.cursorname,
                 mode: mode,
-                color: color
-                /*,
                 showLabel: showLabel,
-                showIntersections: showIntersections,
+                showValuesRelativeToSeries: showValue ? 0 : null,
+                /*
                 symbol: shape,
                 snapToPlot: [undefined, 0, 1][snapToId]*/
             });
@@ -388,18 +360,4 @@ Licensed under the MIT license.
         name: 'cursors-legend',
         version: '0.1'
     });
-
-    function getTextElementByColor(color) {
-        if (color == 'transparent' || color.hex === "") {
-            return $("<div style='text-shadow: none; position: relative; margin: 2px; height: 26px;'><span style='top: 2px; position: relative; font-size: 16px;'>transparent</span></div>");
-        }
-        var element = $("<div style='text-shadow: none; height: 26px; margin: 2px; position: relative;'><span style='top: 2px; position: relative; font-size: 16px;'>#" + color.hex + "</span></div>");
-        var nThreshold = 105;
-        var bgDelta = (color.r * 0.299) + (color.g * 0.587) + (color.b * 0.114);
-        var foreColor = (255 - bgDelta < nThreshold) ? 'Black' : 'White';
-        element.css('color', foreColor);
-        element.css('background', "#" + color.hex);
-        element.addClass('jqx-rc-all');
-        return element;
-    }
 })(jQuery);
